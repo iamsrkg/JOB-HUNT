@@ -97,7 +97,7 @@ while($row=mysqli_fetch_array($query)){
         <div class="container">
           <div class="row d-flex justify-content-center">
             <div class="col-md-7 text-center heading-section heading-section-white ftco-animate">
-              <h2>Subcribe to our page for more information</h2>
+              <h2>Subscribe to our page for more information</h2>
               <p>" A clay pot sitting in the sun will always be a clay pot. It has to go through the white heat of the furnace to become porcelain.”</p>
               <div class="row d-flex justify-content-center mt-4 mb-4">
                 <div class="col-md-8">
