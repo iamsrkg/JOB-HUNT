@@ -20,8 +20,8 @@
   <body class="text-center">
     <form class="form-signin" action="new-post.php" method="post" >
       <img class="mb-4" src="profile_img/logo1.png" alt="" width="100" height="100"> 
-      <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-      <label for="inputEmail" class="sr-only">Email address</label>
+      <h1 class="h3 mb-3 font-weight-normal">Please sign-in</h1>
+      <label for="inputEmail" class="sr-only">Email Address</label>
       <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email address" required autofocus>
       <label for="inputPassword" class="sr-only">Password</label>
       <input type="password" id="inputPassword" name="Password" class="form-control" placeholder="Password" required>
