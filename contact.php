@@ -12,7 +12,7 @@ include('include/h-header.php');
           </div>
           <div class="w-100"></div>
           <div class="col-md-3">
-            <p><span>Address:</span> 000 West 420th Street,Unknown Appartment,bk-Nagar Pune India PIN-9669</p>
+            <p><span>Address:</span> 000 West 420th Street,Unknown Appartment,Chennai, India PIN-9669</p>
           </div>
           <div class="col-md-3">
             <p><span>Phone:</span> <a href="tel://1234567920">+919450xxxxxx</a></p>
