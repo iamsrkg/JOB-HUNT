@@ -36,7 +36,7 @@ session_start();
         </label>
       </div> -->
       <input class="btn btn-lg btn-primary btn-block" type="submit" name="submit" placeholder="Sign in">
-      <a href="sign_up.php">Create an Acount</a>
+      <a href="sign_up.php">Create an Account</a>
       <p class="mt-5 mb-3 text-muted">&copy; 2020-2021</p>
     </form>
   </body>
