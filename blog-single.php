@@ -177,7 +177,7 @@ while($row=mysqli_fetch_array($query)){
                   </div>
                   <div class="comment-body">
                     <h3>John Doe</h3>
-                    <div class="meta">October 03, 2018 at 2:21pm</div>
+                    <div class="meta">July 03, 2020 at 2:21pm</div>
                     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
                     <p><a href="#" class="reply">Reply</a></p>
                   </div>
@@ -189,7 +189,7 @@ while($row=mysqli_fetch_array($query)){
                   </div>
                   <div class="comment-body">
                     <h3>John Doe</h3>
-                    <div class="meta">October 03, 2018 at 2:21pm</div>
+                    <div class="meta">July 03, 2020 at 2:21pm</div>
                     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
                     <p><a href="#" class="reply">Reply</a></p>
                   </div>
@@ -201,7 +201,7 @@ while($row=mysqli_fetch_array($query)){
                       </div>
                       <div class="comment-body">
                         <h3>John Doe</h3>
-                        <div class="meta">October 03, 2018 at 2:21pm</div>
+                        <div class="meta">July 03, 2020 at 2:21pm</div>
                         <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
                         <p><a href="#" class="reply">Reply</a></p>
                       </div>
@@ -214,7 +214,7 @@ while($row=mysqli_fetch_array($query)){
                           </div>
                           <div class="comment-body">
                             <h3>John Doe</h3>
-                            <div class="meta">October 03, 2018 at 2:21pm</div>
+                            <div class="meta">July 03, 2020 at 2:21pm</div>
                             <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
                             <p><a href="#" class="reply">Reply</a></p>
                           </div>
@@ -226,7 +226,7 @@ while($row=mysqli_fetch_array($query)){
                                 </div>
                                 <div class="comment-body">
                                   <h3>John Doe</h3>
-                                  <div class="meta">October 03, 2018 at 2:21pm</div>
+                                  <div class="meta">July 03, 2020 at 2:21pm</div>
                                   <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
                                   <p><a href="#" class="reply">Reply</a></p>
                                 </div>
@@ -244,7 +244,7 @@ while($row=mysqli_fetch_array($query)){
                   </div>
                   <div class="comment-body">
                     <h3>John Doe</h3>
-                    <div class="meta">October 03, 2018 at 2:21pm</div>
+                    <div class="meta">July 03, 2020 at 2:21pm</div>
                     <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Pariatur quidem laborum necessitatibus, ipsam impedit vitae autem, eum officia, fugiat saepe enim sapiente iste iure! Quam voluptas earum impedit necessitatibus, nihil?</p>
                     <p><a href="#" class="reply">Reply</a></p>
                   </div>
@@ -309,7 +309,7 @@ while($row=mysqli_fetch_array($query)){
                 <div class="text">
                   <h3 class="heading"><a href="#">Even the all-powerful Pointing has no control about the blind texts</a></h3>
                   <div class="meta">
-                    <div><a href="#"><span class="icon-calendar"></span> July 12, 2018</a></div>
+                    <div><a href="#"><span class="icon-calendar"></span> July 12, 2020</a></div>
                     <div><a href="#"><span class="icon-person"></span> Admin</a></div>
                     <div><a href="#"><span class="icon-chat"></span> 19</a></div>
                   </div>
@@ -320,7 +320,7 @@ while($row=mysqli_fetch_array($query)){
                 <div class="text">
                   <h3 class="heading"><a href="#">Even the all-powerful Pointing has no control about the blind texts</a></h3>
                   <div class="meta">
-                    <div><a href="#"><span class="icon-calendar"></span> July 12, 2018</a></div>
+                    <div><a href="#"><span class="icon-calendar"></span> July 12, 2020</a></div>
                     <div><a href="#"><span class="icon-person"></span> Admin</a></div>
                     <div><a href="#"><span class="icon-chat"></span> 19</a></div>
                   </div>
@@ -331,7 +331,7 @@ while($row=mysqli_fetch_array($query)){
                 <div class="text">
                   <h3 class="heading"><a href="#">Even the all-powerful Pointing has no control about the blind texts</a></h3>
                   <div class="meta">
-                    <div><a href="#"><span class="icon-calendar"></span> July 12, 2018</a></div>
+                    <div><a href="#"><span class="icon-calendar"></span> July 12, 2020</a></div>
                     <div><a href="#"><span class="icon-person"></span> Admin</a></div>
                     <div><a href="#"><span class="icon-chat"></span> 19</a></div>
                   </div>
