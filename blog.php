@@ -77,7 +77,7 @@ $page='blog';
               </a>
               <div class="text mt-3">
               	<div class="meta mb-2">
-                  <div><a href="#">December 2, 2018</a></div>
+                  <div><a href="#">July 2, 2020</a></div>
                   <div><a href="#">Admin</a></div>
                   <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
                 </div>
@@ -92,7 +92,7 @@ $page='blog';
               </a>
               <div class="text mt-3">
               	<div class="meta mb-2">
-                  <div><a href="#">December 2, 2018</a></div>
+                  <div><a href="#">July 2, 2020</a></div>
                   <div><a href="#">Admin</a></div>
                   <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
                 </div>
@@ -107,7 +107,7 @@ $page='blog';
               </a>
               <div class="text mt-3">
               	<div class="meta mb-2">
-                  <div><a href="#">December 2, 2018</a></div>
+                  <div><a href="#">July 2, 2020</a></div>
                   <div><a href="#">Admin</a></div>
                   <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
                 </div>
@@ -122,7 +122,7 @@ $page='blog';
               </a>
               <div class="text mt-3">
               	<div class="meta mb-2">
-                  <div><a href="#">December 2, 2018</a></div>
+                  <div><a href="#">July 2, 2020</a></div>
                   <div><a href="#">Admin</a></div>
                   <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
                 </div>
@@ -137,7 +137,7 @@ $page='blog';
               </a>
               <div class="text mt-3">
               	<div class="meta mb-2">
-                  <div><a href="#">December 2, 2018</a></div>
+                  <div><a href="#">July 2, 2020</a></div>
                   <div><a href="#">Admin</a></div>
                   <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
                 </div>
@@ -152,7 +152,7 @@ $page='blog';
               </a>
               <div class="text mt-3">
               	<div class="meta mb-2">
-                  <div><a href="#">December 2, 2018</a></div>
+                  <div><a href="#">July 2, 2020</a></div>
                   <div><a href="#">Admin</a></div>
                   <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
                 </div>
@@ -167,7 +167,7 @@ $page='blog';
               </a>
               <div class="text mt-3">
               	<div class="meta mb-2">
-                  <div><a href="#">December 2, 2018</a></div>
+                  <div><a href="#">July 2, 2020</a></div>
                   <div><a href="#">Admin</a></div>
                   <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
                 </div>
@@ -182,7 +182,7 @@ $page='blog';
               </a>
               <div class="text mt-3">
               	<div class="meta mb-2">
-                  <div><a href="#">December 2, 2018</a></div>
+                  <div><a href="#">July 2, 2020</a></div>
                   <div><a href="#">Admin</a></div>
                   <div><a href="#" class="meta-chat"><span class="icon-chat"></span> 3</a></div>
                 </div>
