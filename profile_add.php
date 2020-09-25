@@ -191,7 +191,7 @@ if($query){
 
       <footer class="mastfoot mt-auto">
         <div class="inner">
-          <p style="color:black">Cover template for <a href="">JOBHUNT</a>, by <a href="">@Krishna Tripathi</a>.</p>
+          <p style="color:black">Cover template for <a href="">JOBHUNT</a>, by <a href="">@Sudheer Gupta</a>.</p>
         </div>
       </footer>
     </div>
