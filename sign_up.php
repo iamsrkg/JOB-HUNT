@@ -21,8 +21,8 @@
   <body class="text-center">
     <form class="form-signin" action="sign_up.php" method="post">
       <img class="mb-4" src="profile_img/logo1.png" alt="" width="100" height="100">
-      <h1 class="h3 mb-3 font-weight-normal">Please sign up</h1>
-      <label for="inputEmail" class="sr-only">Email address</label>
+      <h1 class="h3 mb-3 font-weight-normal">Please Sign up</h1>
+      <label for="inputEmail" class="sr-only">Email Address</label>
       <input type="email" name="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
 
        <label for="inputPassword" class="sr-only">Password</label>
