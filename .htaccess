@@ -1,0 +1,5 @@
+# No directory listings, and never serve schema dumps, docs, configs or the dev router.
+Options -Indexes
+<FilesMatch "(\.(sql|md|sh|config|ini|ya?ml|lock)|^router\.php|^Dockerfile)$">
+    Require all denied
+</FilesMatch>

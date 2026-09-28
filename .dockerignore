@@ -1,0 +1,7 @@
+.git
+.github
+tests
+*.log
+files/*
+!files/.htaccess
+!files/.gitkeep

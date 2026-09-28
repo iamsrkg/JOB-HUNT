@@ -3,8 +3,9 @@
 # Usage: import job_portal.sql into a fresh DB, start the app (php -S 127.0.0.1:8000 router.php), then:
 #   B=http://127.0.0.1:8000 DB_PORT=3306 bash tests/e2e.sh
 # Needs curl and the mysql/mariadb client. It resets nothing: run it against a freshly imported database.
+# Against the Docker image (as CI does): MYSQL="docker exec -i jobhunt mariadb" DB_HOST=localhost B=http://127.0.0.1:8080 bash tests/e2e.sh
 B=${B:-http://127.0.0.1:8000}
-MYSQL=${MYSQL:-mysql}
+MYSQL=${MYSQL:-mysql}      # may be a full command, e.g. "docker exec -i jobhunt mariadb"
 APP_DIR=${APP_DIR:-$(cd "$(dirname "$0")/.." && pwd)}
 LOG=${LOG:-}   # optional: path to the PHP server log, to assert no PHP warnings were logged
 T=$(mktemp -d); command -v cygpath >/dev/null && T=$(cygpath -m "$T")
@@ -12,7 +13,7 @@ pass=0; fail=0
 ok()   { pass=$((pass+1)); echo "  PASS  $1"; }
 bad()  { fail=$((fail+1)); echo "  FAIL  $1"; }
 check(){ if eval "$2"; then ok "$1"; else bad "$1"; fi; }
-sql()  { "$MYSQL" -h"${DB_HOST:-127.0.0.1}" -P"${DB_PORT:-3306}" -u"${DB_USER:-root}" ${DB_PASS:+-p"$DB_PASS"} "${DB_NAME:-job_portal}" -N -e "$1" 2>/dev/null; }
+sql()  { $MYSQL -h"${DB_HOST:-127.0.0.1}" -P"${DB_PORT:-3306}" -u"${DB_USER:-root}" ${DB_PASS:+-p"$DB_PASS"} "${DB_NAME:-job_portal}" -N -e "$1" 2>/dev/null; }
 csrf() { curl -s -b "$1" -c "$1" "$B/$2" | grep -o 'name="csrf" value="[a-f0-9]*"' | head -1 | sed 's/.*value="//;s/"//'; }
 status(){ curl -s -o /dev/null -w '%{http_code}' "$@"; }
 location(){ curl -s -o /dev/null -D - "$@" | tr -d '\r' | awk 'tolower($1)=="location:"{print $2}'; }
@@ -82,6 +83,7 @@ tok=$(csrf $JS "blog-single.php?id=2")
 body=$(curl -s -b $JS -c $JS -X POST "$B/apply_job.php" -F csrf=$tok -F id_job=2 -F first_name=Jane -F last_name=Doe -F email=jane.doe@example.com -F phone=0812345678 -F dob=1996-04-12 -F "file=@$T/cv.pdf;type=application/pdf" -F submit=submit)
 stored=$(sql "SELECT file FROM job_apply WHERE id_job=2 AND email='jane.doe@example.com'")
 check "a real PDF is accepted and stored under a random name" 'echo "$body" | grep -q "submitted" && echo "$stored" | grep -qE "^[a-f0-9]{32}\.pdf$"'
+check "schema dump is not downloadable (403)" '[ $(status "$B/job_portal.sql") = 403 ]'
 check "resumes are not directly reachable (/files -> 403)" '[ $(status "$B/files/$stored") = 403 ]'
 appid=$(sql "SELECT id FROM job_apply WHERE id_job=2 AND email='jane.doe@example.com'")
 ct=$(curl -s -o /dev/null -w '%{content_type}' -b $RC "$B/Admin/download_resume.php?id=$appid")
@@ -94,7 +96,7 @@ cp $APP_DIR/profile_img/avtaar.png "$T/me.png"
 tok=$(csrf $JS myprofile.php)
 curl -s -o /dev/null -b $JS -c $JS -X POST "$B/profile_add.php" -F csrf=$tok -F name="Jane Q. Doe" -F dob=1996-04-12 -F number=0812345678 -F email=jane.doe@example.com -F "img=@$T/me.png;type=image/png"
 img=$(sql "SELECT img FROM profile WHERE user_email='jane.doe@example.com'")
-check "profile photo saved with a random name" 'echo "$img" | grep -qE "^[a-f0-9]{32}\.png$" && [ -f "$APP_DIR/profile_img/$img" ]'
+check "profile photo saved with a random name and served" 'echo "$img" | grep -qE "^[a-f0-9]{32}[.]png$" && [ $(status "$B/profile_img/$img") = 200 ]'
 body=$(curl -s -b $JS "$B/myprofile.php")
 check "profile page renders one nav bar and the saved name" '[ $(echo "$body" | grep -c "id=\"ftco-navbar\"") = 1 ] && echo "$body" | grep -q "Jane Q. Doe"'
 

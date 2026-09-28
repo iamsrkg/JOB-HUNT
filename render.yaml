@@ -1,0 +1,13 @@
+# Render Blueprint: one free Docker web service (Apache + PHP + a private MariaDB).
+# The demo database is seeded from job_portal.sql on every start, so it resets on restart.
+services:
+  - type: web
+    name: job-hunt
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /index.php
+    autoDeploy: true
+    envVars:
+      - key: DB_PASS
+        generateValue: true

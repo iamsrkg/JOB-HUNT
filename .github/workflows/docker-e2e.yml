@@ -1,0 +1,32 @@
+name: Docker image + end-to-end tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint PHP
+        run: |
+          find . -name '*.php' -not -path './Admin/email/vendor/*' -print0 | xargs -0 -n1 php -l > /dev/null
+      - name: Build image
+        run: docker build -t job-hunt .
+      - name: Start container
+        run: |
+          docker run -d --name jobhunt -e PORT=8080 -p 8080:8080 job-hunt
+          for i in $(seq 1 60); do curl -sf http://127.0.0.1:8080/index.php > /dev/null && break; sleep 2; done
+          docker logs jobhunt | tail -5
+      - name: End-to-end tests (43 checks)
+        env:
+          B: http://127.0.0.1:8080
+          MYSQL: docker exec -i jobhunt mariadb
+          DB_HOST: localhost
+          DB_USER: root
+        run: bash tests/e2e.sh
+      - name: Container logs on failure
+        if: failure()
+        run: docker logs jobhunt | tail -60
