@@ -1,12 +1,14 @@
 <?php
-session_start();
-error_reporting(0);
-include('connection/db.php');
-$header=mysqli_query($conn,"select * from profile where user_email='{$_SESSION['email']}'");
-while($row=mysqli_fetch_array($header)){
-  $img=$row['img'];
-  $name=$row['name'];
+require_once __DIR__ . '/../connection/db.php';
+$img = $name = '';
+if (current_user_email() !== null) {
+  $header = db("SELECT img, name FROM profile WHERE user_email = ? LIMIT 1", [current_user_email()]);
+  if ($row = $header->fetch_assoc()) {
+    $img = $row['img'];
+    $name = $row['name'];
+  }
 }
+$page = $page ?? '';
 ?>
 
 <!DOCTYPE html>
@@ -54,13 +56,13 @@ while($row=mysqli_fetch_array($header)){
 	          <li class="nav-item <?php if ($page=='contact') { echo 'active';}?>"><a href="contact.php" class="nav-link">Contact</a></li>
 	         
 	         <?php
-             if(isset($_SESSION['email'])==true){ ?>
-              <li class="nav-item cta mr-md-2"><a href="job-post.php" class="nav-link"><?php if(empty($name)){echo $_SESSION['email'];} else{ echo $name; }  ?></a></li>
+             if(current_user_email() !== null){ ?>
+              <li class="nav-item cta mr-md-2"><a href="myprofile.php" class="nav-link"><?php echo e(empty($name) ? current_user_email() : $name); ?></a></li>
              
 
               <li class="nav-item ">
                 <div class="dropdown">
-                  <img  src="profile_img/<?php if(empty($img)){echo "avtaar.png";}else{ echo  $img ;} ?>"class="img-circle dropdown-toggle" type="button" data-toggle="dropdown" alt="Cinque Terre" width="50" height="50">
+                  <img  src="profile_img/<?php echo e(empty($img) ? 'avtaar.png' : $img); ?>" class="img-circle dropdown-toggle" type="button" data-toggle="dropdown" alt="Cinque Terre" width="50" height="50">
                   <ul class="dropdown-menu">
                     
                      <li><a href="logout.php" style="color: cyan;">Logout</a></li>

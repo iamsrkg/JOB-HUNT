@@ -1,5 +1,6 @@
 <?php
 include('include/header.php');
+require_admin(true);
 include('include/sidebar.php');
 ?>
 
@@ -35,21 +36,18 @@ include('include/sidebar.php');
         <tbody>
             
         <?php
-        include('connection/db.php');
-        $query=mysqli_query($conn,"select * from job_category");
-        while($row=mysqli_fetch_array($query)){
-        ?>            
-            
+        $query = db("SELECT id, category, des FROM job_category ORDER BY category");
+        while($row = $query->fetch_assoc()){
+        ?>
             <tr>
-                <td><?php echo $row['id']; ?></td>
-                <td><?php echo $row['category']; ?></td>
-                <td><?php echo $row['des']; ?></td>
-                
+                <td><?php echo (int) $row['id']; ?></td>
+                <td><?php echo e($row['category']); ?></td>
+                <td><?php echo e($row['des']); ?></td>
                <td>
                     <div class="row">
-                      <div class="btn-group"> 
-                        <a href="edit_category.php?edit=<?php echo $row['id']; ?>" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span></a>
-                        <a href="delete_category.php?del=<?php echo $row['id']; ?>" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                      <div class="btn-group">
+                        <a href="edit_category.php?edit=<?php echo (int) $row['id']; ?>" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span></a>
+                        <a href="delete_category.php?del=<?php echo (int) $row['id']; ?>&amp;csrf=<?php echo e(csrf_token()); ?>" class="btn btn-danger" onclick="return confirm('Delete this category?')"><span class="glyphicon glyphicon-trash"></span></a>
                       </div>
 
                     </div>

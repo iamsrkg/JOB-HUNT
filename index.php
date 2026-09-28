@@ -46,10 +46,9 @@ include('include/header.php');
                                   <select name="category" id="category" class="form-control">
                                     <option value="">Category</option>
                                       <?php
-                                      include('connection/db.php');
-                                      $query=mysqli_query($conn, "SELECT * FROM job_category");
-                                      while($row=mysqli_fetch_array($query)){ ?>
-                                        <option value="<?php echo $row['id']; ?>"><?php echo $row['category']; ?></option>
+                                      $categories = db("SELECT id, category FROM job_category ORDER BY category");
+                                      while($row = $categories->fetch_assoc()){ ?>
+                                        <option value="<?php echo (int) $row['id']; ?>"><?php echo e($row['category']); ?></option>
                                       <?php  } ?>
                                   </select>
                                 </div>
@@ -132,30 +131,36 @@ include('include/header.php');
     </div>
 
 <?php
-include('connection/db.php');
-if (isset($_POST['search']) or($_GET['page'])) {
+// Job search: filters come from the form (POST) or a pagination link (GET).
+// Every value is bound as a parameter; only integer-cast numbers reach the SQL text.
+$perPage = 3;
+$keyword = trim((string) ($_POST['key'] ?? $_GET['keyword'] ?? ''));
+$category = trim((string) ($_POST['category'] ?? $_GET['category'] ?? ''));
+$pageNo = isset($_POST['search']) ? 1 : max(1, (int) ($_GET['page'] ?? 1));
 
-  $page=$_GET['page'];
-  if($page==""){
-    $page1=0;
-  $keyword=$_POST['key'];
-  $category=$_POST['category'];
-  }
-  else{
-    $keyword=$_GET['keyword'];
-    $category=$_GET['category'];
-    $page1=($page*3)-3;
-    
-  }
-
-  
-  
-  $sql1="SELECT * FROM all_jobs LEFT JOIN company ON all_jobs.customer_email=company.admin where keyword LIKE '%$keyword%' OR category='$category' limit $page1,3";
-$sql=mysqli_query($conn,$sql1 );
-$error=mysqli_num_rows($sql1);
- 
+$conditions = [];
+$params = [];
+if ($keyword !== '') {
+  $like = '%' . $keyword . '%';
+  $conditions[] = '(all_jobs.job_title LIKE ? OR all_jobs.keyword LIKE ? OR all_jobs.des LIKE ?)';
+  array_push($params, $like, $like, $like);
 }
- 
+if ($category !== '') {
+  $conditions[] = 'all_jobs.category = ?';
+  $params[] = $category;
+}
+$where = $conditions ? 'WHERE ' . implode(' AND ', $conditions) : '';
+
+$total = (int) db("SELECT COUNT(*) AS n FROM all_jobs $where", $params)->fetch_assoc()['n'];
+$pages = max(1, (int) ceil($total / $perPage));
+$pageNo = min($pageNo, $pages);
+$offset = ($pageNo - 1) * $perPage;
+$jobs = db(
+  "SELECT all_jobs.*, company.company_name FROM all_jobs
+   LEFT JOIN company ON all_jobs.customer_email = company.admin
+   $where ORDER BY all_jobs.job_id DESC LIMIT " . (int) $offset . ', ' . (int) $perPage,
+  $params
+);
 ?>
 <div id="id_all_j">
 <section class="ftco-section bg-light">
@@ -174,12 +179,9 @@ $error=mysqli_num_rows($sql1);
 
 
             <marquee direction="right"><h2 style="color: red;" class="mb-4"><span>Recent</span> Jobs</h2></marquee>
-            <!-- <br>  <br>
-            <h3> <?php
-            if ($error=="") {
-              echo "Data Not Found!!!! ";
-            }
-            ?></h3> -->
+            <?php if ($total === 0) { ?>
+            <h3>No jobs match your search.</h3>
+            <?php } ?>
 
           </div>
         </div>
@@ -188,7 +190,7 @@ $error=mysqli_num_rows($sql1);
           <?php 
 
           
-          while ($row=mysqli_fetch_array($sql)) { ?>
+          while ($row = $jobs->fetch_assoc()) { ?>
           
           <div class="col-md-12 ftco-animate">
 
@@ -196,19 +198,19 @@ $error=mysqli_num_rows($sql1);
 
               <div class="mb-4 mb-md-0 mr-5">
                 <div class="job-post-item-header d-flex align-items-center">
-                  <h2 class="mr-3 text-black h3"><?php echo $row['job_title'];?></h2>
+                  <h2 class="mr-3 text-black h3"><?php echo e($row['job_title']);?></h2>
                   <div class="badge-wrap">
                    <span class="bg-primary text-white badge py-2 px-3"></span>
                   </div>
                 </div>
                 <div class="job-post-item-body d-block d-md-flex">
-                  <div class="mr-3"><span class="icon-layers"></span> <a href="#"><?php echo $row['company_name'];?>,<?php echo $row['des'];?></a></div>
-                  <div><span class="icon-my_location"></span> <span><?php echo $row['country'];?>,<?php echo $row['state'];?>,<?php echo $row['city'];?></span></div>
+                  <div class="mr-3"><span class="icon-layers"></span> <a href="#"><?php echo e($row['company_name']);?>, <?php echo e($row['des']);?></a></div>
+                  <div><span class="icon-my_location"></span> <span><?php echo e($row['country']);?>, <?php echo e($row['state']);?>, <?php echo e($row['city']);?></span></div>
                 </div>
               </div>
 
               <div class="ml-auto d-flex">
-                <a href="blog-single.php?id=<?php echo $row['job_id'];?>" class="btn btn-primary py-2 mr-1">Apply Job</a>
+                <a href="blog-single.php?id=<?php echo (int) $row['job_id'];?>" class="btn btn-primary py-2 mr-1">Apply Job</a>
                 <a href="#" class="btn btn-secondary rounded-circle btn-favorite d-flex align-items-center icon">
                   <span class="icon-heart"></span>
                 </a>
@@ -228,16 +230,10 @@ $error=mysqli_num_rows($sql1);
             <div class="block-27">
               <ul>
                 <li><a href="#">&lt;</a></li>
-                <?php 
-                
-                $sql2=mysqli_query($conn,"SELECT * FROM all_jobs LEFT JOIN company ON all_jobs.customer_email=company.admin where keyword LIKE '%$keyword%' OR category='$category'");
-                $count=mysqli_num_rows($sql2);
-                $a=$count/3;
-                ceil($a);
-                for ($b=1; $b <=$a ; $b++) { 
+                <?php for ($b = 1; $b <= $pages; $b++) {
+                  $link = 'index.php?' . http_build_query(['page' => $b, 'keyword' => $keyword, 'category' => $category]);
                 ?>
-
-               <li><a href="index.php?page=<?php echo $b;?> & keyword=<?php echo $keyword;?> & category=<?php echo $category;?>"><?php echo $b;?></a></li>
+               <li class="<?php echo $b === $pageNo ? 'active' : ''; ?>"><a href="<?php echo e($link); ?>"><?php echo $b; ?></a></li>
                 <?php } ?>
                 <li><a href="#">&gt;</a></li>
               </ul>

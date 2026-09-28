@@ -1,6 +1,4 @@
 <?php
-include('connection/db.php');
-
 include('include/header.php');
 include('include/sidebar.php');
 ?>
@@ -42,27 +40,29 @@ include('include/sidebar.php');
         <tbody>
             
         <?php
-        include('connection/db.php');
-        $query=mysqli_query($conn,"select * from all_jobs where customer_email='{$_SESSION['email']}'");
-        while($row=mysqli_fetch_array($query)){
-        ?>            
-            
+        // Super admins see every job; recruiters only the jobs they posted.
+        $sql = "SELECT all_jobs.*, job_category.category AS category_name FROM all_jobs
+                LEFT JOIN job_category ON job_category.id = all_jobs.category";
+        $query = is_super_admin()
+          ? db("$sql ORDER BY all_jobs.job_id DESC")
+          : db("$sql WHERE all_jobs.customer_email = ? ORDER BY all_jobs.job_id DESC", [current_admin_email()]);
+        while($row = $query->fetch_assoc()){
+        ?>
             <tr>
-            	<td><?php echo $row['job_id']; ?></td>
-                <td><?php echo $row['customer_email']; ?></td>
-                <td><?php echo $row['job_title']; ?></td>
-                <td><?php echo $row['des']; ?></td>
-                <td><?php echo $row['country']; ?></td>
-                <td><?php echo $row['state']; ?></td>
-                <td><?php echo $row['city']; ?></td>
-                <td><?php echo $row['keyword']; ?></td>
-                <td><?php echo $row['category']; ?></td>
-                
+            	<td><?php echo (int) $row['job_id']; ?></td>
+                <td><?php echo e($row['customer_email']); ?></td>
+                <td><?php echo e($row['job_title']); ?></td>
+                <td><?php echo e(mb_strimwidth($row['des'], 0, 120, '…')); ?></td>
+                <td><?php echo e($row['country']); ?></td>
+                <td><?php echo e($row['state']); ?></td>
+                <td><?php echo e($row['city']); ?></td>
+                <td><?php echo e($row['keyword']); ?></td>
+                <td><?php echo e($row['category_name'] ?? $row['category']); ?></td>
                <td>
                     <div class="row">
-                      <div class="btn-group"> 
-                        <a href="job_edit.php?edit=<?php echo $row['job_id']; ?>" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span></a>
-                        <a href="job_delete.php?del=<?php echo $row['job_id']; ?>" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                      <div class="btn-group">
+                        <a href="job_edit.php?edit=<?php echo (int) $row['job_id']; ?>" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span></a>
+                        <a href="job_delete.php?del=<?php echo (int) $row['job_id']; ?>&amp;csrf=<?php echo e(csrf_token()); ?>" class="btn btn-danger" onclick="return confirm('Delete this job?')"><span class="glyphicon glyphicon-trash"></span></a>
                       </div>
 
                     </div>

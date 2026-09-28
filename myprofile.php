@@ -1,31 +1,35 @@
 <?php
+require_once __DIR__ . '/connection/db.php';
+require_user();
+include('include/myprofile_header.php');   // already includes the site header
 
-include('connection/db.php');
-include('include/myprofile_header.php');
-include('include/header.php');
-$query=mysqli_query($conn,"select * from profile where user_email='{$_SESSION['email']}'");
-while($row=mysqli_fetch_array($query)){
-        $img=$row['img'];
-        $name=$row['name'];
-        $dob=$row['dob'];
-        $number=$row['number'];
-        $email=$row['email'];
-}
+$profile = db("SELECT img, name, dob, number, email FROM profile WHERE user_email = ? LIMIT 1", [current_user_email()])->fetch_assoc() ?: [];
+$img = $profile['img'] ?? '';
+$name = $profile['name'] ?? '';
+$dob = $profile['dob'] ?? '';
+$number = $profile['number'] ?? '';
+$email = $profile['email'] ?? '';
+$notice = $_SESSION['profile_notice'] ?? null;
+unset($_SESSION['profile_notice']);
 ?>
 
     
 <br>
 <div style="margin-left: 25%; width: 50%; border: 1px solid gray; padding: 10px;">
+  <?php if ($notice) { ?>
+    <div class="alert alert-<?php echo $notice['ok'] ? 'success' : 'danger'; ?>" role="alert"><?php echo e($notice['message']); ?></div>
+  <?php } ?>
   <form action="profile_add.php" method="POST" id="profile_form" name="profile_form" enctype="multipart/form-data">
-    
+    <?php echo csrf_field(); ?>
 
     <div class="row">
       <div class="col-md-6">
-         <img src="profile_img/<?php if(!empty($img)){echo $img;} else{echo "avtaar.png" ;} ?>" class="img-thumbnail" alt="Cinque Terre">
+         <img src="profile_img/<?php echo e($img !== '' ? $img : 'avtaar.png'); ?>" class="img-thumbnail" alt="Profile photo">
       </div>
       
       <div class="col-md-4">
-        <input type="file" class="form-control" name="img" id="img">
+        <input type="file" class="form-control" name="img" id="img" accept=".jpg,.jpeg,.png,.webp">
+        <small class="text-muted">JPG, PNG or WebP, max 2 MB</small>
         
       </div>
       
@@ -39,7 +43,7 @@ while($row=mysqli_fetch_array($query)){
             </div>
 
             <div class="col-md-6">
-            <td><input type="text" name="name" id="name" value="<?php  if(!empty($name)) echo $name;?>" placeholder="Enter Your Name..." class="form-group"></td>
+            <td><input type="text" name="name" id="name" value="<?php echo e($name); ?>" placeholder="Enter Your Name..." class="form-group"></td>
             </div>
         </div>
 
@@ -51,7 +55,7 @@ while($row=mysqli_fetch_array($query)){
           </div>
 
           <div class="col-md-6">
-          <td><input type="date" name="dob" id="dob" value="<?php  if(!empty($dob)) echo $dob;?>" placeholder="Enter Your DOB..." class="form-group"></td>
+          <td><input type="date" name="dob" id="dob" value="<?php echo e($dob); ?>" placeholder="Enter Your DOB..." class="form-group"></td>
           </div>
       </div>
 
@@ -63,7 +67,7 @@ while($row=mysqli_fetch_array($query)){
           </div>
 
           <div class="col-md-6">
-          <td><input type="number" name="number" id="number" value="<?php  if(!empty($number)) echo $number;?>" placeholder="Enter Your Mobile Number..." class="form-group"></td>
+          <td><input type="tel" name="number" id="number" value="<?php echo e($number); ?>" placeholder="Enter Your Mobile Number..." class="form-group"></td>
           </div>
     </div>
 
@@ -75,7 +79,7 @@ while($row=mysqli_fetch_array($query)){
           </div>
 
           <div class="col-md-6">
-          <td><input type="text" name="email" id="email" value="<?php  if(!empty($email)) echo $email;?>" placeholder="Enter Your Email..." class="form-group"></td>
+          <td><input type="email" name="email" id="email" value="<?php echo e($email); ?>" placeholder="Enter Your Email..." class="form-group"></td>
           </div>
      </div>
 

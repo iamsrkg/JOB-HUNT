@@ -1,5 +1,6 @@
 <?php
 include('include/header.php');
+require_admin(true);
 include('include/sidebar.php');
 ?>
 
@@ -36,22 +37,19 @@ include('include/sidebar.php');
         <tbody>
             
         <?php
-        include('connection/db.php');
-        $query=mysqli_query($conn,"select * from company");
-        while($row=mysqli_fetch_array($query)){
-        ?>            
-            
+        $query = db("SELECT company_id, company_name, des, admin FROM company ORDER BY company_id");
+        while($row = $query->fetch_assoc()){
+        ?>
             <tr>
-                <td><?php echo $row['company_id']; ?></td>
-                <td><?php echo $row['company_name']; ?></td>
-                <td><?php echo $row['des']; ?></td>
-                <td><?php echo $row['admin']; ?></td>
-                
+                <td><?php echo (int) $row['company_id']; ?></td>
+                <td><?php echo e($row['company_name']); ?></td>
+                <td><?php echo e($row['des']); ?></td>
+                <td><?php echo e($row['admin']); ?></td>
                <td>
                     <div class="row">
-                      <div class="btn-group"> 
-                        <a href="company_edit.php?edit=<?php echo $row['company_id']; ?>" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span></a>
-                        <a href="company_delete.php?del=<?php echo $row['company_id']; ?>" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                      <div class="btn-group">
+                        <a href="company_edit.php?edit=<?php echo (int) $row['company_id']; ?>" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span></a>
+                        <a href="company_delete.php?del=<?php echo (int) $row['company_id']; ?>&amp;csrf=<?php echo e(csrf_token()); ?>" class="btn btn-danger" onclick="return confirm('Delete this company?')"><span class="glyphicon glyphicon-trash"></span></a>
                       </div>
 
                     </div>

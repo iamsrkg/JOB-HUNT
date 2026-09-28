@@ -1,10 +1,11 @@
 <?php
-session_start();
+require_once __DIR__ . '/connection/db.php';
+require_user();
 
-if(isset($_SESSION['email'])==true){
-
-}else{
-  header('location:job-post.php');
+$job = db("SELECT job_id, job_title, des, country, state, city FROM all_jobs WHERE job_id = ?", [(int) ($_GET['id'] ?? 0)])->fetch_assoc();
+if (!$job) {
+  http_response_code(404);
+  exit('Job not found. <a href="index.php">Back to jobs</a>');
 }
 ?>
 
@@ -52,8 +53,8 @@ if(isset($_SESSION['email'])==true){
 	          <li class="nav-item active"><a href="blog.php" class="nav-link">Blog</a></li>
 	          <li class="nav-item active"><a href="contact.php" class="nav-link">Contact</a></li>
 	         <?php
-             if(isset($_SESSION['email'])==true){ ?>
-              <li class="nav-item cta mr-md-2"><a href="job-post.php" class="nav-link"><?php echo $_SESSION['email']; ?></a></li>
+             if(current_user_email() !== null){ ?>
+              <li class="nav-item cta mr-md-2"><a href="myprofile.php" class="nav-link"><?php echo e(current_user_email()); ?></a></li>
               <li class="nav-item cta cta-colored"><a href="logout.php" class="nav-link">Logout</a></li>
               <?php
              }else { ?>
@@ -69,19 +70,6 @@ if(isset($_SESSION['email'])==true){
 	  </nav>
     <!-- END nav -->
 
-<?php
-include('connection/db.php');
-$id=$_GET['id'];
-$query=mysqli_query($conn,"SELECT * from all_jobs where job_id='$id'");
-while($row=mysqli_fetch_array($query)){
-  $title=$row['job_title'];
-  $des=$row['des'];
-  $country=$row['country'];
-  $state=$row['state'];
-  $city=$row['city'];
-  $id_job=$row['job_id'];
-}
-?>
 
     
     <div class="hero-wrap js-fullheight" style="background-image: url('images/bgi2.jpeg');" data-stellar-background-ratio="0.5">
@@ -102,16 +90,16 @@ while($row=mysqli_fetch_array($query)){
           <div class="col-md-8 ftco-animate">
 
 
-            <h2 class="mb-3" style="color:blue"><td><?php echo $title; ?></td></h2>
-            <h5><?php echo $country;?>,<?php echo $state;?>,<?php echo $city;?></h5>
-            <p><?php echo $des; ?><p>
+            <h2 class="mb-3" style="color:blue"><?php echo e($job['job_title']); ?></h2>
+            <h5><?php echo e($job['country']);?>, <?php echo e($job['state']);?>, <?php echo e($job['city']);?></h5>
+            <p><?php echo nl2br(e($job['des'])); ?></p>
               <!-- <img src="images/image_7.jpg" alt="" class="img-fluid">
             </p> -->
             
             <form action="apply_job.php" method="post" id="JobHunt" enctype="multipart/form-data" style="border: 1px solid gray"> 
             <div style="padding: 2%;">
-              <input type="hidden" name="job_seeker" value="<?php echo $_SESSION['email'];?>" id="job_seeker">
-              <input type="hidden" name="id_job" value="<?php echo $id_job; ?>" id="id_job">
+              <?php echo csrf_field(); ?>
+              <input type="hidden" name="id_job" value="<?php echo (int) $job['job_id']; ?>" id="id_job">
 
             <div class="row">
             <div class="col-sm-6">
@@ -131,7 +119,7 @@ while($row=mysqli_fetch_array($query)){
             </div>
             <div class="col-sm-6">
               <label for="">Enter Email...</label>
-              <input type="text" class="form-control"  name="email" placeholder="Email Address" >  
+              <input type="email" class="form-control" name="email" placeholder="Email Address" value="<?php echo e(current_user_email()); ?>" required>
             </div>
           </div>
 
@@ -141,8 +129,8 @@ while($row=mysqli_fetch_array($query)){
               <input type="date" class="form-control" name="dob" placeholder="date of birth">  
             </div>
             <div class="col-sm-6">
-              <label for="">Choose Resume</label>
-              <input type="file" class="form-control" name="file">   
+              <label for="">Choose Resume (PDF, DOC or DOCX, max 5 MB)</label>
+              <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx" required>
             </div>
           </div>
 

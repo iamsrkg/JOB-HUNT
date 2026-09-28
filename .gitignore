@@ -1,0 +1,14 @@
+
+# Uploaded content (resumes and profile photos are personal data)
+files/*
+!files/.htaccess
+!files/.gitkeep
+profile_img/*
+!profile_img/.htaccess
+!profile_img/avtaar.png
+!profile_img/logo1.png
+!profile_img/my_img.jpg
+!profile_img/roshani.png
+
+# Local environment
+.env

@@ -1,7 +1,7 @@
-<?php 
-$conn=mysqli_connect("localhost","root","","job_portal");
-$query=mysqli_query($conn,"select * from admin_login where admin_email='{$_SESSION['email']}' and admin_type='1'");
-if(mysqli_num_rows($query)>0){
+<?php
+require_once __DIR__ . '/../connection/db.php';
+// Menus only mirror permissions; each page enforces its own access with require_admin().
+if (is_super_admin()) {
 
 ?>
 

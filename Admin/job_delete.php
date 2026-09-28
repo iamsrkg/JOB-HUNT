@@ -1,12 +1,13 @@
 <?php
-include('connection/db.php');
- $del=$_GET['del'];
- $query= mysqli_query($conn,"delete from all_jobs where job_id='$del'");
+// Delete a job. Recruiters can only delete their own; super admins can delete any.
+require_once __DIR__ . '/connection/db.php';
+require_admin();
+require_csrf();
 
-if($query){
-echo "<script>alert('Record has been successfully Deleted!!!!!!')</script>";
-header('location:job_create.php');
-}else{
-	echo "<script>alert('Record has been successfully Deleted!!!!!!')</script>";
+$id = (int) ($_GET['del'] ?? 0);
+if (is_super_admin()) {
+  db("DELETE FROM all_jobs WHERE job_id = ?", [$id]);
+} else {
+  db("DELETE FROM all_jobs WHERE job_id = ? AND customer_email = ?", [$id, current_admin_email()]);
 }
-?>
+redirect('job_create.php');

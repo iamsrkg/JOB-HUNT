@@ -1,5 +1,45 @@
+<?php
+require_once __DIR__ . '/connection/db.php';
+require_user();
 
+// Handle the application before any HTML, so errors and redirects work.
+$result = null;   // ['ok' => bool, 'message' => string]
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+    require_csrf();
 
+    $firstName = trim((string) ($_POST['first_name'] ?? ''));
+    $lastName = trim((string) ($_POST['last_name'] ?? ''));
+    $email = trim((string) ($_POST['email'] ?? ''));
+    $phone = preg_replace('/\D+/', '', (string) ($_POST['phone'] ?? ''));
+    $dob = (string) ($_POST['dob'] ?? '');
+    $jobId = (int) ($_POST['id_job'] ?? 0);
+
+    $dobDate = DateTime::createFromFormat('Y-m-d', $dob);
+    if ($firstName === '' || $lastName === '' || mb_strlen($firstName) > 100 || mb_strlen($lastName) > 100) {
+        $result = ['ok' => false, 'message' => 'Please enter your first and last name.'];
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $result = ['ok' => false, 'message' => 'Please enter a valid email address.'];
+    } elseif (strlen($phone) < 7 || strlen($phone) > 15) {
+        $result = ['ok' => false, 'message' => 'Please enter a valid phone number.'];
+    } elseif (!$dobDate || $dobDate->format('Y-m-d') !== $dob) {
+        $result = ['ok' => false, 'message' => 'Please enter your date of birth.'];
+    } elseif (!db("SELECT 1 FROM all_jobs WHERE job_id = ?", [$jobId])->fetch_row()) {
+        $result = ['ok' => false, 'message' => 'That job no longer exists.'];
+    } elseif (db("SELECT 1 FROM job_apply WHERE email = ? AND id_job = ?", [$email, $jobId])->fetch_row()) {
+        $result = ['ok' => false, 'message' => 'You have already applied for this job.'];
+    } else {
+        // Random name + content-checked type: the uploader never controls the path or extension.
+        $stored = store_upload($_FILES['file'] ?? [], APP_ROOT . '/files', RESUME_TYPES, 5 * 1024 * 1024, $uploadError);
+        if ($stored === null) {
+            $result = ['ok' => false, 'message' => $uploadError];
+        } else {
+            db("INSERT INTO job_apply (first_name, last_name, dob, file, id_job, email, phone) VALUES (?, ?, ?, ?, ?, ?, ?)",
+               [$firstName, $lastName, $dob, $stored, $jobId, $email, $phone]);
+            $result = ['ok' => true, 'message' => 'Your application has been submitted.'];
+        }
+    }
+}
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -154,49 +194,16 @@ body {
       <main role="main" class="inner cover">
         <h1 class="cover-heading" style="color:silver">Cover your page.</h1>
 
-<?php
-    include('connection/db.php');
-    if(isset($_POST['submit'])) {
-
-        
-        $first_name=$_POST['first_name'];
-        $last_name=$_POST['last_name'];
-        $dob=$_POST['dob'];
-        $email=$_POST['email'];
-        $file=$_FILES['file']['name'];
-        $name = md5(rand());
-        $files1=$email.".".$file;
-
-        $tmp_name=$_FILES['file']['tmp_name'];
-        $id_job=$_POST['id_job'];
-        $phone=$_POST['phone'];
-        $q="select * from job_apply where email='$email' and id_job='$id_job'";
-        $sql=mysqli_query($conn,$q);
-        if(mysqli_num_rows($sql)>0){
-          echo "<h2>Already applied!!!!<h2>";
-        }else{
-
-        move_uploaded_file($_FILES["file"]["tmp_name"],'files/'.$files1);
-
-        $query=mysqli_query($conn,"insert into job_apply(first_name,last_name,dob,file,id_job,email,phone)values('$first_name','$last_name','$dob','$files1','$id_job','$email','$phone')");
-
-        if ($query) { ?>
-            <p class="lead" style="color:black">Your Form Successfully Added!!</p>
-            <?php   
-        }else{
-            echo "Not";
-        }
-
-    }
-  }
-?>
+<?php if ($result !== null) { ?>
+        <p class="lead" style="color:<?php echo $result['ok'] ? 'black' : 'darkred'; ?>"><?php echo e($result['message']); ?></p>
+<?php } ?>
 
 
         
 
 
         <p class="lead">
-          <a href="http://localhost/job_portal" class="btn btn-lg btn-secondary">Back</a>
+          <a href="index.php" class="btn btn-lg btn-secondary">Back to jobs</a>
         </p>
       </main>
 

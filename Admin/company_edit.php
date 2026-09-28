@@ -1,25 +1,40 @@
 <?php
-include('connection/db.php');
+require_once __DIR__ . '/connection/db.php';
+require_admin(true);
 
-include('include/header.php');
-include('include/sidebar.php');
-
-$id=$_GET['edit'];
-$query=mysqli_query($conn,"select * from company where company_id= '$id'");
-
-while($row=mysqli_fetch_array($query)){
-$company_name=$row['company_name'];
-$des=$row['des'];
-$admin=$row['admin'];
-
+$id = (int) ($_GET['edit'] ?? $_POST['id'] ?? 0);
+$company = db("SELECT company_id, company_name, des, admin FROM company WHERE company_id = ?", [$id])->fetch_assoc();
+if (!$company) {
+  http_response_code(404);
+  exit('Company not found. <a href="create_company.php">Back</a>');
 }
 
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+  require_csrf();
+  $name = trim((string) ($_POST['Company'] ?? ''));
+  $des = trim((string) ($_POST['des'] ?? ''));
+  $admin = trim((string) ($_POST['admin'] ?? ''));
 
+  if ($name === '' || mb_strlen($name) > 100) {
+    $error = 'Enter a company name (up to 100 characters).';
+  } elseif (mb_strlen($des) > 1000) {
+    $error = 'Description is too long.';
+  } elseif (!db("SELECT 1 FROM admin_login WHERE admin_email = ? AND admin_type = '2'", [$admin])->fetch_row()) {
+    $error = 'Choose a valid company admin.';
+  } else {
+    db("UPDATE company SET company_name = ?, des = ?, admin = ? WHERE company_id = ?", [$name, $des, $admin, $id]);
+    redirect('create_company.php');
+  }
+  $company = array_merge($company, ['company_name' => $name, 'des' => $des, 'admin' => $admin]);
+}
 
-
+$admins = db("SELECT admin_email FROM admin_login WHERE admin_type = '2' ORDER BY admin_email");
+include('include/header.php');
+include('include/sidebar.php');
 ?>
 <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
-                      <nav aria-label="breadcrumb">
+            <nav aria-label="breadcrumb">
               <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="admin_dashboard.php">Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="create_company.php">Company</a></li>
@@ -27,108 +42,41 @@ $admin=$row['admin'];
               </ol>
             </nav>
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            
             <h1 class="h2">Update Company</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-              <div class="btn-group mr-2">
-                
-              </div>
-              <!-- <a class="btn btn-primary" href="add_customer.php">Add Customer</a> -->
-            </div>
           </div>
-          
+
            <div style="width: 60%; margin-left: 20%; background-color: #EBEDEF;">
-            
-            <form action="" method="post" style="margin: 3%; padding: 3%;" name="customer_form" id="customer_form">
-              <div id="msg"> </div>
+            <form action="company_edit.php" method="post" style="margin: 3%; padding: 3%;" name="company_form" id="company_form">
+              <?php if ($error) { ?><div class="alert alert-danger"><?php echo e($error); ?></div><?php } ?>
+              <?php echo csrf_field(); ?>
+              <input type="hidden" name="id" value="<?php echo (int) $company['company_id']; ?>">
               <div class="form-group">
-               <label for="Customer Email">Enter Company Name</label> 
-               <input type="Company" name="Company" id="Company" value="<?php echo $company_name; ?>" class="form-control" placeholder="Enter Company Name"> 
+               <label for="Company">Company name</label>
+               <input type="text" name="Company" id="Company" value="<?php echo e($company['company_name']); ?>" class="form-control" required>
               </div>
-                  <div class="form-group">
-                   <label for="Customer Username"> Enter Description </label> 
-                   <textarea name="des" id="des" class="form-control" cols="30" rows="10">
-                     <?php  echo $des; ?>
-                   </textarea>
-                  </div>
-
-
-                  <div class="form-group">
-                   <label for="Customer Username">Select Company Admin</label> 
-                   <select name="admin" id="admin" class="form-control">
-                     <?php 
-                     include('connection/db.php');
-                        $sql=mysqli_query($conn,"select * from admin_login where admin_type='2'");
-                       while($row=mysqli_fetch_array($sql)){ ?>
-                        <option value="<?php echo $row['admin_email'];?>" > <?php echo $row['admin_email']; ?> 
-                      </option>
-
-                    <?php    } ?>
-                     
-
-                   </select>
-                  </div>
-                          
-                          <input type="hidden" name="id" id="id" value="<?php echo $_GET['edit'];?>">
-                      <div class="form-group">
-                        
-                       <input type="submit" class="btn btn-block btn-success" placeholder="Update" name="submit" id="submit"> 
-                      </div>
-
-                </form>
+              <div class="form-group">
+               <label for="des">Description</label>
+               <textarea name="des" id="des" class="form-control" cols="30" rows="10"><?php echo e($company['des']); ?></textarea>
               </div>
-
-         <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
-
-          <div class="table-responsive">
-            
-          </div>
+              <div class="form-group">
+               <label for="admin">Company admin</label>
+               <select name="admin" id="admin" class="form-control">
+                 <?php while ($row = $admins->fetch_assoc()) { ?>
+                   <option value="<?php echo e($row['admin_email']); ?>" <?php echo $row['admin_email'] === $company['admin'] ? 'selected' : ''; ?>><?php echo e($row['admin_email']); ?></option>
+                 <?php } ?>
+               </select>
+              </div>
+              <div class="form-group">
+               <input type="submit" class="btn btn-block btn-success" value="Update" name="submit" id="submit">
+              </div>
+            </form>
+           </div>
         </main>
       </div>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\/script>')</script>
-    <script src="../../assets/js/vendor/popper.min.js"></script>
-    <script src="../../dist/js/bootstrap.min.js"></script>
-
-    <!-- Icons -->
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
     <script src="https://unpkg.com/feather-icons/dist/feather.min.js"></script>
-    <script>
-      feather.replace()
-    </script>
-<!-- datatables plugin -->
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-
-
-
-<script>
-$(document).ready(function() {
-    $('#example').DataTable();
-} );
-</script>
-
+    <script>feather.replace()</script>
   </body>
 </html>
-
-<?php
-include('connection/db.php');
-if(isset($_POST['submit'])){
-	$id=$_POST['id'];
-	$company_name=$_POST['Company'];
-	$des=$_POST['des'];
-  $admin=$_POST['admin'];
-	
-	
-   $query1=mysqli_query($conn,"update Company set company_name='$company_name',des='$des',admin='$admin' where company_id='$id'");
-   if($query1){
-   	echo "<script>alert('Record has been Updated successfully !!!')</script>";
-   }else{
-   	echo "<script>alert('some error please try again')</script>";
-   }
-}
-
-
-
-?>

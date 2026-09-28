@@ -1,5 +1,6 @@
 <?php
 include('include/header.php');
+require_admin(true);
 include('include/sidebar.php');
 ?>
 
@@ -28,6 +29,7 @@ include('include/sidebar.php');
             
             <form action="" method="post" style="margin: 3%; padding: 3%;" name="company_form" id="company_form">
               <div id="msg"> </div>
+              <?php echo csrf_field(); ?>
               <div class="form-group">
                <label for="Customer Email">Category Name</label> 
                <input type="text" name="category" id="category" class="form-control" placeholder="Enter Category Name"> 
@@ -80,7 +82,8 @@ $(document).ready(function() {
 </script>
 <script>
   $(document).ready(function(){
-  $("#submit").click(function(){
+  $(document).ajaxError(function(ev, x){ alert(x.responseText || "Request failed."); });
+  $("#submit").click(function(e){ e.preventDefault();
        var Description=$("#Description").val();
        var category=$("#category").val();
            if(Description==''){

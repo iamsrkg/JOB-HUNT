@@ -1,12 +1,12 @@
 <?php
-include('connection/db.php');
- $del=$_GET['del'];
- $query= mysqli_query($conn,"delete from admin_login where id='$del'");
+// Delete a job-provider account. Super admins only; the link carries a CSRF token.
+require_once __DIR__ . '/connection/db.php';
+require_admin(true);
+require_csrf();
 
-if($query){
-echo "<script>alert('Record has been successfully Deleted!!!!!!')</script>";
-header('location:Customers.php');
-}else{
-	echo "<script>alert('Record has been successfully Deleted!!!!!!')</script>";
+$id = (int) ($_GET['del'] ?? 0);
+if ($id === (int) $_SESSION['admin_id']) {
+  exit('You cannot delete your own account. <a href="Customers.php">Back</a>');
 }
-?>
+db("DELETE FROM admin_login WHERE id = ?", [$id]);
+redirect('Customers.php');

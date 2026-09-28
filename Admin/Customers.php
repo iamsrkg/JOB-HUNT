@@ -1,5 +1,6 @@
 <?php
 include('include/header.php');
+require_admin(true);
 include('include/sidebar.php');
 
 ?>
@@ -42,23 +43,21 @@ include('include/sidebar.php');
         <tbody>
             
         <?php
-        include('connection/db.php');
-        $query=mysqli_query($conn,"select * from admin_login");
-        while($row=mysqli_fetch_array($query)){
-        ?>            
-            
+        $query = db("SELECT id, admin_email, admin_username, first_name, last_name, admin_type FROM admin_login ORDER BY id");
+        while($row = $query->fetch_assoc()){
+        ?>
             <tr>
-                <td><?php echo $row['id']; ?></td>
-                <td><?php echo $row['admin_email']; ?></td>
-                <td><?php echo $row['admin_username']; ?></td>
-                <td><?php echo $row['first_name']; ?></td>
-                <td><?php echo $row['last_name']; ?></td>
-                <td><?php echo $row['admin_type']; ?></td>
+                <td><?php echo (int) $row['id']; ?></td>
+                <td><?php echo e($row['admin_email']); ?></td>
+                <td><?php echo e($row['admin_username']); ?></td>
+                <td><?php echo e($row['first_name']); ?></td>
+                <td><?php echo e($row['last_name']); ?></td>
+                <td><?php echo $row['admin_type'] === '1' ? 'Super Admin' : 'Company'; ?></td>
                <td>
                     <div class="row">
-                      <div class="btn-group"> 
-                        <a href="customer_edit.php?edit=<?php echo $row['id']; ?>" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span></a>
-                        <a href="customer_delete.php?del=<?php echo $row['id']; ?>" class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></a>
+                      <div class="btn-group">
+                        <a href="customer_edit.php?edit=<?php echo (int) $row['id']; ?>" class="btn btn-success"><span class="glyphicon glyphicon-pencil"></span></a>
+                        <a href="customer_delete.php?del=<?php echo (int) $row['id']; ?>&amp;csrf=<?php echo e(csrf_token()); ?>" class="btn btn-danger" onclick="return confirm('Delete this account?')"><span class="glyphicon glyphicon-trash"></span></a>
                       </div>
 
                     </div>

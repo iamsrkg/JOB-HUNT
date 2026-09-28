@@ -1,6 +1,4 @@
 <?php
-include('connection/db.php');
-
 include('include/header.php');
 include('include/sidebar.php');
 ?>
@@ -14,7 +12,7 @@ include('include/sidebar.php');
             </nav>
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
             
-            <h1 class="h2">All Jobs</h1>
+            <h1 class="h2">Applications</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
               <div class="btn-group mr-2">
                 
@@ -31,7 +29,8 @@ include('include/sidebar.php');
                 <th>Description</th>
                 <th>Job Seeker Name</th>
                 <th>Job Seeker Email</th>    
-                <th>Job Seeker File</th>
+                <th>Resume</th>
+                <th>Status</th>
                <th>Action</th>
                 
             </tr>
@@ -39,24 +38,22 @@ include('include/sidebar.php');
         <tbody>
             
         <?php
-        include('connection/db.php');
-        $a=1;
-        $sql="select * from job_apply LEFT JOIN all_jobs ON job_apply.id_job=all_jobs.job_id where customer_email='{$_SESSION['email']}'" ;
-        $query=mysqli_query($conn,$sql);
-        while($row=mysqli_fetch_array($query)){
-        ?>            
-            
+        $a = 1;
+        $query = visible_applications();
+        while($row = $query->fetch_assoc()){
+        ?>
             <tr>
             	<td><?php echo $a; ?></td>
-                <td><?php echo $row['job_title']; ?></td>
-                <td><?php echo $row['des']; ?></td>
-                <td><?php echo $row['first_name']; ?> <?php echo $row['last_name']; ?></td>
-                <td><?php echo $row['email']; ?></td>
-                <td><a href="http://localhost/job_portal/files/<?php echo $row['file']; ?>">Download File</a></td> 
+                <td><?php echo e($row['job_title']); ?></td>
+                <td><?php echo e(mb_strimwidth($row['des'], 0, 80, '…')); ?></td>
+                <td><?php echo e($row['first_name'] . ' ' . $row['last_name']); ?></td>
+                <td><?php echo e($row['email']); ?></td>
+                <td><?php if ($row['file'] !== '' && $row['file'] !== null) { ?><a href="download_resume.php?id=<?php echo (int) $row['id']; ?>">Download</a><?php } else { ?>—<?php } ?></td>
+                <td><?php echo e(ucfirst($row['status'])); ?></td>
                <td>
                     <div class="row">
-                      <div class="btn-group"> 
-                        <a href="view_applied_jobs.php?id=<?php echo $row['id']; ?>"><span class="glyphicon glyphicon-eye-open"></span></a>
+                      <div class="btn-group">
+                        <a href="view_applied_jobs.php?id=<?php echo (int) $row['id']; ?>"><span class="glyphicon glyphicon-eye-open"></span></a>
                         
                       </div>
 
@@ -73,7 +70,8 @@ include('include/sidebar.php');
                 <th>Description</th>
                 <th>Job Seeker Name</th>
                 <th>Job Seeker Email</th>    
-                <th>Job Seeker File</th>
+                <th>Resume</th>
+                <th>Status</th>
                <th>Action</th>
 
             </tr>

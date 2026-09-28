@@ -1,11 +1,8 @@
 <?php
 include('include/header.php');
+require_admin(true);
 include('include/sidebar.php');
-?>
-<?php 
-include('connection/db.php');
-$query=mysqli_query($conn,"select * from admin_login where admin_type='2'");
-
+$query = db("SELECT admin_email FROM admin_login WHERE admin_type = '2' ORDER BY admin_email");
 ?>
 
 <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
@@ -33,8 +30,9 @@ $query=mysqli_query($conn,"select * from admin_login where admin_type='2'");
             
             <form action="" method="post" style="margin: 3%; padding: 3%;" name="company_form" id="company_form">
               <div id="msg"> </div>
+              <?php echo csrf_field(); ?>
               <div class="form-group">
-               <label for="Customer Email">Company Name</label> 
+               <label for="Company">Company Name</label>
                <input type="text" name="Company" id="Company" class="form-control" placeholder="Enter Company Name"> 
               </div>
                   <div class="form-group">
@@ -46,8 +44,8 @@ $query=mysqli_query($conn,"select * from admin_login where admin_type='2'");
                    <label for="Customer Username">Select Company Admin</label> 
                    <select name="admin" id="admin" class="form-control">
                      <?php 
-                       while($row=mysqli_fetch_array($query)){ ?>
-                        <option value="<?php echo $row['admin_email'];?>" > <?php echo $row['admin_email']; ?> 
+                       while($row = $query->fetch_assoc()){ ?>
+                        <option value="<?php echo e($row['admin_email']);?>"><?php echo e($row['admin_email']); ?>
                       </option>
 
                     <?php    } ?>
@@ -99,7 +97,8 @@ $(document).ready(function() {
 </script>
 <script>
   $(document).ready(function(){
-  $("#submit").click(function(){
+  $(document).ajaxError(function(ev, x){ alert(x.responseText || "Request failed."); });
+  $("#submit").click(function(e){ e.preventDefault();
        var Description=$("#Description").val();
        var Company=$("#Company").val();
            if(Description==''){

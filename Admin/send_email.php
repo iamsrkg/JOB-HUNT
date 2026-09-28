@@ -1,8 +1,14 @@
 <?php
-include('connection/db.php');
-
+require_once __DIR__ . '/connection/db.php';
+require_admin();
+$app = find_application((int) ($_GET['id'] ?? 0));
+if (!$app) {
+  http_response_code(404);
+  exit('Application not found. <a href="apply_jobs.php">Back</a>');
+}
 include('include/header.php');
 include('include/sidebar.php');
+$applicant = $app['first_name'] . ' ' . $app['last_name'];
 ?>
 
 <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
@@ -25,41 +31,25 @@ include('include/sidebar.php');
 
          <form action="mailer.php" method="post" style="border: 1px solid gray; width: 60%; margin-left: 10%; padding: 10px">
 
-        <?php     
-        include('connection/db.php');
-        $id=$_GET['id'];
-        $sql="select * from job_apply LEFT JOIN all_jobs ON job_apply.id_job=all_jobs.job_id where id='$id'" ;
-        $query=mysqli_query($conn,$sql);
-        while($row=mysqli_fetch_array($query)){
-        ?>            
-            
-<h1><?php echo strtoupper($row['first_name']);?> <?php echo strtoupper($row['last_name']);?></h1>
-<hr>
-
-<input type="hidden" id="id" name="id" value="<?php echo $id;?>">
+          <?php echo csrf_field(); ?>
+          <h1><?php echo e($applicant); ?></h1>
+          <p class="text-muted">Application for <?php echo e($app['job_title']); ?></p>
+          <hr>
+          <input type="hidden" name="id" value="<?php echo (int) $app['id']; ?>">
           <div class="form-group">
-              <label for="">To:</label>
-            <td><input type="email" id="to" name="to" class="form-control" value="<?php echo $row['email'];?>"></td>
-            </div>
-
-           
-               <div class="form-group">
-              <label for="">Form:</label>
-            <td><input type="email" name="from" id="from" class="form-control" placeholder="From.... "></td>
-            </div>
-
-              
-           <div class="form-group">
-              <label for="">Body:</label>
-            <td><textarea name="body" class="form-control" cols="30" rows="10"> Dear <?php echo strtoupper($row['first_name']); ?> <?php echo strtoupper($row['last_name']);?></textarea></td>
-            </div>  
-                
-                 
-              
-                
-        
-        <?php  } ?>
-         <input type="submit" class="btn btn-success" name="submit" id="submit" value="Send">
+            <label>To:</label>
+            <input type="email" class="form-control" value="<?php echo e($app['email']); ?>" readonly>
+            <small class="text-muted">Replies from the applicant go to <?php echo e(current_admin_email()); ?>.</small>
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject:</label>
+            <input type="text" name="subject" id="subject" class="form-control" maxlength="150" value="<?php echo e('Your application for ' . $app['job_title']); ?>" required>
+          </div>
+          <div class="form-group">
+            <label for="body">Message:</label>
+            <textarea name="body" id="body" class="form-control" cols="30" rows="10" maxlength="5000" required><?php echo e("Dear $applicant,\n\nThank you for applying. We'd like to move forward with your application.\n\n"); ?></textarea>
+          </div>
+         <input type="submit" class="btn btn-success" name="submit" id="submit" value="Send &amp; mark accepted">
         
         
 

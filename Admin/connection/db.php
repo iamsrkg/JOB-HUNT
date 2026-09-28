@@ -1,4 +1,3 @@
 <?php
-$conn=mysqli_connect("localhost","root","","job_portal");
-
-?>
+// Admin pages include this; it loads the shared bootstrap (DB connection, session, helpers).
+require_once __DIR__ . '/../../lib/bootstrap.php';

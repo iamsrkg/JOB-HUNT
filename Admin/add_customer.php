@@ -1,5 +1,6 @@
 <?php
 include('include/header.php');
+require_admin(true);
 include('include/sidebar.php');
 ?>
       
@@ -28,6 +29,7 @@ include('include/sidebar.php');
             
             <form action="" method="post" style="margin: 3%; padding: 3%;" name="customer_form" id="customer_form">
               <div id="msg"> </div>
+              <?php echo csrf_field(); ?>
               <div class="form-group">
                <label for="Customer Email">Enter Email</label> 
                <input type="email" name="email" id="email" class="form-control" placeholder="Enter JOB-PROVIDER email"> 
@@ -39,7 +41,7 @@ include('include/sidebar.php');
 
                        <div class="form-group">
                        <label for="Password">Enter Password</label> 
-                       <input type="pass" name="Password" id="Password" class="form-control" placeholder="Enter Password"> 
+                       <input type="password" name="Password" id="Password" class="form-control" placeholder="At least 8 characters" minlength="8" autocomplete="new-password">
                       </div>
 
                        <div class="form-group">
@@ -56,7 +58,7 @@ include('include/sidebar.php');
                        <label for="Admin Type">Admin Type</label> 
                        <select name="admin_type" name="admin_type" class="form-control" id="admin_type">
                        <option value="1">Super Admin</option> 
-                       <option value="2">Customer Admin</option> 
+                       <option value="2" selected>Company (Customer Admin)</option>
                      </select>
                       </div>
 
@@ -100,7 +102,8 @@ $(document).ready(function() {
 </script>
 <script>
   $(document).ready(function(){
-    $("#submit").click(function(){
+    $(document).ajaxError(function(ev, x){ alert(x.responseText || "Request failed."); });
+  $("#submit").click(function(e){ e.preventDefault();
        var email=$("#email").val();
        var Username=$("#Username").val();
        var Password=$("#Password").val();

@@ -1,6 +1,11 @@
 <?php
-include('connection/db.php');
-
+require_once __DIR__ . '/connection/db.php';
+require_admin();
+$app = find_application((int) ($_GET['id'] ?? 0));
+if (!$app) {
+  http_response_code(404);
+  exit('Application not found. <a href="apply_jobs.php">Back</a>');
+}
 include('include/header.php');
 include('include/sidebar.php');
 ?>
@@ -23,59 +28,28 @@ include('include/sidebar.php');
             </div>
           </div>
 
-         <form action="" style="border: 1px solid gray; width: 80%; margin-left: 10%; padding: 10px">
+         <div style="border: 1px solid gray; width: 80%; margin-left: 10%; padding: 10px">
+           <div class="form-group"><label>Job title:</label> <?php echo e($app['job_title']); ?></div>
+           <div class="form-group"><label>Description:</label> <?php echo nl2br(e($app['des'])); ?></div>
+           <div class="form-group"><label>Applicant:</label> <?php echo e($app['first_name'] . ' ' . $app['last_name']); ?></div>
+           <div class="form-group"><label>Email:</label> <?php echo e($app['email']); ?></div>
+           <div class="form-group"><label>Contact number:</label> <?php echo e($app['phone']); ?></div>
+           <div class="form-group"><label>Date of birth:</label> <?php echo e($app['dob']); ?></div>
+           <div class="form-group"><label>Resume:</label>
+             <?php if ($app['file'] !== '' && $app['file'] !== null) { ?><a href="download_resume.php?id=<?php echo (int) $app['id']; ?>">Download</a><?php } else { ?>Not uploaded<?php } ?>
+           </div>
+           <div class="form-group"><label>Status:</label> <?php echo e(ucfirst($app['status'])); ?></div>
 
-        <?php
-        include('connection/db.php');
-        $id=$_GET['id'];
-        $sql="select * from job_apply LEFT JOIN all_jobs ON job_apply.id_job=all_jobs.job_id where customer_email='{$_SESSION['email']}'" ;
-        $query=mysqli_query($conn,$sql);
-        while($row=mysqli_fetch_array($query)){
-        ?>            
-            
-           <div class="form-group">
-              <label for="">Job Title:</label>
-            <td><?php echo $row['job_title']; ?></td>
-            </div>
-
-           
-               <div class="form-group">
-              <label for="">Description:</label>
-            <td><?php echo $row['des']; ?></td>
-            </div>
-
-              <div class="form-group">
-              <label for="">Job Seeker Name:</label>
-            <td><?php echo $row['first_name']; ?> <?php echo $row['last_name']; ?></td>
-            </div>
-              <div class="form-group">    
-              <label for="">Email:</label>
-            <td><?php echo $row['email']; ?></td>
-            </div> 
-
-            <div class="form-group">    
-              <label for="">Contact Number:</label>
-            <td><?php echo $row['phone']; ?></td>
-            </div> 
-              
-              <div class="form-group">
-              <label for="">File:</label>
-            <td><a href="http://localhost/job_portal/files/<?php echo $row['file']; ?>">Download File</a></td>
-            </div>
-             
-             
-                
-                 
-              
-                
-        
-        <?php  } ?>
-         <a href="send_email.php?id=<?php echo $id;?>" class="btn btn-success">Accept</a>
-         <a href="reject_job.php?id=<?php echo $id;?>" class="btn btn-danger">Reject</a>
-        
-        
-
-        </form>
+           <?php if ($app['status'] === 'new') { ?>
+             <a href="send_email.php?id=<?php echo (int) $app['id']; ?>" class="btn btn-success">Accept &amp; email applicant</a>
+             <form action="reject_job.php" method="post" style="display:inline" onsubmit="return confirm('Reject this application?')">
+               <?php echo csrf_field(); ?>
+               <input type="hidden" name="id" value="<?php echo (int) $app['id']; ?>">
+               <button type="submit" class="btn btn-danger">Reject</button>
+             </form>
+           <?php } ?>
+           <a href="apply_jobs.php" class="btn btn-secondary">Back to applications</a>
+         </div>
         
 
          <canvas class="my-4" id="myChart" width="900" height="380"></canvas>

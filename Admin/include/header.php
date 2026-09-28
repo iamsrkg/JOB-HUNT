@@ -1,11 +1,8 @@
 
 <?php
-session_start();
-if($_SESSION['email']==true){
-
-}else{
-  header('location:admin_login.php');
-}
+require_once __DIR__ . '/../connection/db.php';
+// Every admin page includes this header: no admin session, no page.
+require_admin();
 ?>
 <!doctype html>
 <html lang="en">
@@ -38,13 +35,13 @@ if($_SESSION['email']==true){
     <link href="css/dashboard.css" rel="stylesheet">
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> 
-<script src="//geodata.solutions/includes/countrystatecity.js"></script>
+<!-- Country/state/city are plain text fields now: no third-party script runs in the admin area. -->
   </head>
 
 
 <body>
   <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#"><?php echo $_SESSION['email'];?></a>
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#"><?php echo e(current_admin_email());?></a>
       <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">

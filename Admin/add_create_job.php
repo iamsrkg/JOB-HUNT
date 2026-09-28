@@ -3,8 +3,8 @@ include('include/header.php');
 include('include/sidebar.php');
 ?>
 
-<?php 
-$query=mysqli_query($conn,"select * from job_category");
+<?php
+$query = db("SELECT id, category FROM job_category ORDER BY category");
 ?>
 
 <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
@@ -31,6 +31,7 @@ $query=mysqli_query($conn,"select * from job_category");
           <div style="width: 60%; margin-left: 20%; background-color: #EBEDEF;">
             
             <form action="" method="post" style="margin: 3%; padding: 3%;" name="job_form" id="job_form">
+              <?php echo csrf_field(); ?>
               <div id="msg"> </div>
               <div class="form-group">
                <label for="Customer Email">Job Title</label> 
@@ -48,23 +49,17 @@ $query=mysqli_query($conn,"select * from job_category");
 
                        <div class="form-group">
                          <label for="">Country </label>
-                         <select name="country" class="countries form-control" id="countryId">
-                          <option value="">Select Country</option>
-                      </select>
+                         <input type="text" name="country" class="form-control" id="countryId" maxlength="100" placeholder="e.g. Thailand">
                        </div>
-                       
+
                        <div class="form-group">
                          <label for="">State </label>
-                         <select name="state" class="states form-control" id="stateId">
-                            <option value="">Select State</option>
-                        </select>
+                         <input type="text" name="state" class="form-control" id="stateId" maxlength="100" placeholder="e.g. Bangkok">
                        </div>
-                        
+
                        <div class="form-group">
                          <label for="">City</label>
-                         <select name="city" class="cities form-control" id="cityId">
-                            <option value="">Select City</option>
-                        </select>
+                         <input type="text" name="city" class="form-control" id="cityId" maxlength="100" placeholder="e.g. Bangkok">
                        </div>
 
 
@@ -73,9 +68,9 @@ $query=mysqli_query($conn,"select * from job_category");
                          <select name="category" class="form-control" id="category">
 
                           <?php
-                            while($row=mysqli_fetch_array($query)){
+                            while($row = $query->fetch_assoc()){
                               ?>
-                            <option value="<?php echo  $row['id']; ?>"><?php echo $row['category']; ?> </option>
+                            <option value="<?php echo (int) $row['id']; ?>"><?php echo e($row['category']); ?></option>
 
                             <?php
                             }
@@ -125,7 +120,8 @@ $(document).ready(function() {
 </script>
 <script>
   $(document).ready(function(){
-  $("#submit").click(function(){
+  $(document).ajaxError(function(ev, x){ alert(x.responseText || "Request failed."); });
+  $("#submit").click(function(e){ e.preventDefault();
        var Description=$("#Description").val();
        var job_title=$("#job_title").val();
        var countryId=$("#countryId").val();
