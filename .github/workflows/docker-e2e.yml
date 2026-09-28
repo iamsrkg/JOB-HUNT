@@ -20,7 +20,9 @@ jobs:
           docker run -d --name jobhunt -e PORT=8080 -p 8080:8080 job-hunt
           for i in $(seq 1 60); do curl -sf http://127.0.0.1:8080/index.php > /dev/null && break; sleep 2; done
           docker logs jobhunt | tail -5
-      - name: End-to-end tests (43 checks)
+      - name: Database reachable from the test runner
+        run: docker exec -i jobhunt mariadb -hlocalhost -P3306 -uroot job_portal -N -e "SELECT COUNT(*) FROM all_jobs"
+      - name: End-to-end tests (44 checks)
         env:
           B: http://127.0.0.1:8080
           MYSQL: docker exec -i jobhunt mariadb
