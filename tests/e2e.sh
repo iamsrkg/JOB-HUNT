@@ -13,7 +13,9 @@ pass=0; fail=0
 ok()   { pass=$((pass+1)); echo "  PASS  $1"; }
 bad()  { fail=$((fail+1)); echo "  FAIL  $1"; }
 check(){ if eval "$2"; then ok "$1"; else bad "$1"; fi; }
-sql()  { $MYSQL -h"${DB_HOST:-127.0.0.1}" -P"${DB_PORT:-3306}" -u"${DB_USER:-root}" ${DB_PASS:+-p"$DB_PASS"} "${DB_NAME:-job_portal}" -N -e "$1" 2>/dev/null; }
+# DB_HOST=localhost means the Unix socket: MariaDB's client switches to TCP whenever a port is given.
+if [ "${DB_HOST:-127.0.0.1}" = localhost ]; then DB_ADDR=""; else DB_ADDR="-h${DB_HOST:-127.0.0.1} -P${DB_PORT:-3306}"; fi
+sql()  { $MYSQL $DB_ADDR -u"${DB_USER:-root}" ${DB_PASS:+-p"$DB_PASS"} "${DB_NAME:-job_portal}" -N -e "$1" 2>/dev/null; }
 csrf() { curl -s -b "$1" -c "$1" "$B/$2" | grep -o 'name="csrf" value="[a-f0-9]*"' | head -1 | sed 's/.*value="//;s/"//'; }
 status(){ curl -s -o /dev/null -w '%{http_code}' "$@"; }
 location(){ curl -s -o /dev/null -D - "$@" | tr -d '\r' | awk 'tolower($1)=="location:"{print $2}'; }
