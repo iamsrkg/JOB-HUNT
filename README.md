@@ -42,6 +42,14 @@ This started as a 2020 college project. In 2026 I revisited it as a **security-h
 B=http://127.0.0.1:8000 DB_PORT=3306 bash tests/e2e.sh     # RESULT: 43 passed, 0 failed
 ```
 
+## Try it in your browser
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/iamsrkg/JOB-HUNT?quickstart=1)
+
+One click builds the same Docker image CI tests (Apache + PHP 8.3 + its own MariaDB with demo data) in your own GitHub account. After about 2 minutes, the portal opens in a new tab. Log in with one of the demo accounts below.
+
+**With Docker:** `docker build -t job-hunt . && docker run -e PORT=8080 -p 8080:8080 job-hunt`, then open `http://localhost:8080`.
+
 ## Run it locally
 
 **XAMPP / any Apache + PHP 8.1+ + MySQL/MariaDB:** put the folder in `htdocs`, create a `job_portal` database, import `job_portal.sql`, and open `http://localhost/JOB-HUNT/`.

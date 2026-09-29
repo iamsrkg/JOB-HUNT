@@ -1,0 +1,16 @@
+{
+  "name": "JOB-HUNT: PHP 8.3 + Apache + MariaDB",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  // Builds the same image CI tests, with its own MariaDB seeded with demo data. First start takes ~2 minutes.
+  "postStartCommand": "docker build -t job-hunt . && (docker rm -f jobhunt || true) && docker run -d --name jobhunt -e PORT=8080 -p 8080:8080 job-hunt",
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": { "label": "JOB-HUNT job portal", "onAutoForward": "openBrowser" }
+  },
+  "customizations": {
+    "codespaces": { "openFiles": ["README.md"] }
+  }
+}

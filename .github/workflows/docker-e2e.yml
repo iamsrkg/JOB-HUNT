@@ -32,3 +32,19 @@ jobs:
       - name: Container logs on failure
         if: failure()
         run: docker logs jobhunt | tail -60
+
+  # Starts the portal exactly the way the "Open in Codespaces" button does, and checks it answers.
+  codespace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: devcontainers/ci@v0.3
+        with:
+          push: never
+          runCmd: |
+            docker build -t job-hunt . && docker run -d --name jobhunt -e PORT=8080 -p 8080:8080 job-hunt
+            for i in $(seq 1 60); do curl -sf http://localhost:8080/index.php > /dev/null && break; sleep 3; done
+            curl -sf http://localhost:8080/index.php | grep -qi "job"
+            test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/Admin/admin_login.php)" = 200
+            test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/job_portal.sql)" = 403
+            echo "Codespace start-up check passed"
